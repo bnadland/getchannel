@@ -1,6 +1,8 @@
 getchannel
 ==========
 
+Scrapes the first page of video urls from a youtube channel.
+
 Dependencies
 ------------
 
