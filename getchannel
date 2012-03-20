@@ -31,6 +31,9 @@ if ($#ARGV < 0) {
   die "You need to provide at least one channel name!\n";
 }
 
+# XXX: additional pages:
+# http://www.youtube.com/user/TotalHalibut/videos?sort=dd&view=u&page=2
+
 for my $arg (0 .. $#ARGV) {
   my $channelname = $ARGV[$arg];
 
