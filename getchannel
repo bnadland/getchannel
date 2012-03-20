@@ -44,7 +44,7 @@ for my $arg (0 .. $#ARGV) {
 foreach my $tag (@$result) {
 	if ($tag->{href}) {
 		if ($tag->{href} =~ m{/watch\?v=(.*)\&feat.*} ) {
-			if (grep $_ eq $1, @links) {
+			if (grep /$1/, @links) {
 				# id is already in list do not add it again 
 			} 
 			else {
