@@ -61,7 +61,7 @@ sub update_channel {
 		}
   }
 
-  # TODO: concat @new_links and @old_links
+  push @new_links, @old_links;
   return @new_links;
 }
 
