@@ -20,40 +20,58 @@ use warnings;
 use Data::Dumper;
 use Mojo::UserAgent;
 
-my $ua;
-my $message;
-my $result;
-my @links;
+sub update_channel {
+  my ($channelname, @old_links) = @_;
 
-$ua = Mojo::UserAgent->new;
+  my @new_links;
+  my $continue_scraping = 1;
+
+  while ($continue_scraping) {
+    my $page = 0;
+		my $new_vids = 1;
+    while ($new_vids) {
+			$new_vids = 0;
+			$page += 1;
+      my $url_base = 'http://www.youtube.com/user/' . $channelname . '/videos?sort=dd&view=u&page=';
+      my $ua     = Mojo::UserAgent->new;
+      my $result = $ua->get($url_base . $page)->res->dom('a');
+
+      foreach my $tag (@$result) {
+        if ($tag->{href}) {
+          if ($tag->{href} =~ m{/watch\?v=(.*)\&feat.*}) {
+            if (grep /$1/, @old_links) {
+              # we already have all new video ids, abort scraping
+              $continue_scraping = 0;
+            }
+            if (grep /$1/, @new_links) {
+              # video id is a duplicate, do not add it
+            }
+            else {
+              push @new_links, $1;
+							$new_vids = 1;
+            }
+          }
+        }
+      }
+			
+			if ($new_vids == 0) {
+				# there are no new video ids on this page, we likely got to the last page
+				$continue_scraping = 0;
+			}
+		}
+  }
+
+  # TODO: concat @new_links and @old_links
+  return @new_links;
+}
 
 if ($#ARGV < 0) {
   die "You need to provide at least one channel name!\n";
 }
 
-# XXX: additional pages:
-# http://www.youtube.com/user/TotalHalibut/videos?sort=dd&view=u&page=2
-
+# foreach channel
 for my $arg (0 .. $#ARGV) {
-  my $channelname = $ARGV[$arg];
-
-	$result = $ua->get('https://www.youtube.com/user/' . $channelname .'/videos')
-		->res->dom('a');
-}
-
-foreach my $tag (@$result) {
-	if ($tag->{href}) {
-		if ($tag->{href} =~ m{/watch\?v=(.*)\&feat.*} ) {
-			if (grep /$1/, @links) {
-				# id is already in list do not add it again 
-			} 
-			else {
-				push @links, $1;
-			}
-		}
-	}
-}
-
-foreach my $link (@links) {
-	say $link;
+  foreach my $link (update_channel($ARGV[$arg], ())) {
+    say $link;
+  }
 }
