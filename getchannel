@@ -17,7 +17,6 @@ use 5.010;
 use strict;
 use warnings;
 
-use Data::Dumper;
 use Mojo::UserAgent;
 
 sub update_channel {
@@ -65,13 +64,18 @@ sub update_channel {
   return @new_links;
 }
 
-if ($#ARGV < 0) {
-  die "You need to provide at least one channel name!\n";
+
+sub main {
+	if ($#ARGV < 0) {
+		die "You need to provide at least one channel name!\n";
+	}
+
+	# foreach channel
+	for my $arg (0 .. $#ARGV) {
+		foreach my $link (update_channel($ARGV[$arg], ())) {
+			say $link;
+		}
+	}
 }
 
-# foreach channel
-for my $arg (0 .. $#ARGV) {
-  foreach my $link (update_channel($ARGV[$arg], ())) {
-    say $link;
-  }
-}
+main();
